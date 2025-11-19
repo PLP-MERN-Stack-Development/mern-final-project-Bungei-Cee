@@ -1,54 +1,53 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-function LoginPage({ onLogin }) {
+const LoginPage = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // You can add real backend login here
-    if (email && password) {
-      onLogin();
+    const result = login(email, password);
+    if (result.success) {
+      navigate("/");
     } else {
-      alert("Please enter email and password");
+      setError(result.message);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded shadow">
-        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1 font-semibold">Email</label>
-            <input
-              type="email"
-              className="w-full px-3 py-2 border rounded"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-semibold">Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 border rounded"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="********"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+    <div style={{ display: "flex", justifyContent: "center", marginTop: "100px" }}>
+      <form onSubmit={handleSubmit} style={{ width: "300px" }}>
+        <h2>Login</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <div>
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ width: "100%", marginBottom: "10px" }}
+          />
+        </div>
+        <div>
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: "100%", marginBottom: "10px" }}
+          />
+        </div>
+        <button type="submit">Login</button>
+      </form>
     </div>
   );
-}
+};
 
 export default LoginPage;

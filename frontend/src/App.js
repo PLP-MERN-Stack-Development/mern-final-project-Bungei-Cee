@@ -1,42 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Check token properly – avoids false positives
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token && token !== "undefined" && token !== "null" && token !== "") {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, []);
-
-  const handleLogin = () => {
-    localStorage.setItem("token", "sample_token");
-    setIsLoggedIn(true);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
-
-    // Force redirect to login page
-    window.location.reload();
-  };
+  const { isAuthenticated } = useAuth();
 
   return (
-    <div>
-      {isLoggedIn ? (
-        <Dashboard onLogout={handleLogout} />
-      ) : (
-        <LoginPage onLogin={handleLogin} />
-      )}
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/" /> : <LoginPage />}
+      />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 }
 
